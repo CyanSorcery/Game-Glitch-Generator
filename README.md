@@ -4,7 +4,11 @@ Create a glitched image from a sprite table in the style of NES, SNES, or Gamebo
 # What it is
 There are two functions written in PHP. One allows you to optimize a sprite table, and the other allows you to create a glitched image based on this sprite table. The resulting image looks like a glitched image from the NES, SNES, or Gameboy, generated with the limitations of each in mind.
 
-Please see <code>exampleoutput.png</code> if you want to see what this code makes, or you can view [@ErrGraphics](https://twitter.com/errgraphic) on Twitter to see my bot which uses this code.
+Here is an example of what the code does:
+
+![Generated Image Example](exampleoutput.png)
+
+You can also view [@ErrGraphics](https://twitter.com/errgraphic) on Twitter to see my bot which uses this code.
 
 # What's contained?
 
@@ -17,15 +21,19 @@ This generates an optimizes sprite table and removes duplicate tiles from the ta
 
 ><b><code>$sourcetable</code></b> - Path to source sprite table
 >
-> This is the path to the sprite table we'll be optimizing. It MUST be an 8x8 4 color image. Please see <code>example.png</code> for an example. If you open this in GIMP or Aseprite, you can easily add graphics to it.
+> This is the path to the sprite table we'll be optimizing. It MUST be an 8x8 4 color image. If you open this in GIMP or Aseprite, you can easily add graphics to it. Here is an example:
+>
+>![Example sprite table](example.png)
 
 ><b><code>$desttable</code></b> - Path to save optimized sprite table to
 >
-> This is where we will save the optmized sprite table to. Please see <code>exampleopt.png</code> for an example of what the sprite table will look like.
+> This is where we will save the optmized sprite table to. Here is an example:
+>
+>![Example optimized sprite table](exampleopt.png)
 
 > <b><code>$trimbott</code> (OPTIONAL)</b> [Default <code>true</code>] - Trims the last row off
 >
-> This trims the last row off of the image. This can be useful because the last row will more than likely have excess blank tiles on it.
+> This trims the last row off of the image. This can be useful because the last row will more than likely have excess blank tiles on it. In the example above, the last row has been trimmed off.
 
 > <b><code>$tablecols</code> (OPTIONAL)</b> [Default <code>32</code>] - Width of the optimized sprite table, in columns
 >
@@ -42,13 +50,13 @@ This function creates a glitched image based on the sprite table that we made wi
 
 ><b><code>$outputpath</code></b> - Path where we'll save the image.
 >
-> This is where we'll save the output glitched image. Please see <code>exampleoutput.png</code> for an example of what this code produces.
+> This is where we'll save the output glitched image. At the top of this README is an example of what this code outputs.
 
 > <b><code>$upscalemult</code> (OPTIONAL)</b> [Default <code>3</code>] - How much we'll upscale the image
 >
 > This specifies how much we'll upscale the image. Set to 1 to have a 1:1 output ratio.
 
-> <b><code>$gphxmode</code> (OPTIONAL)</b> [Default <code>'DEFAULT'</code></b> - Output mode of the glitched graphics
+> <b><code>$gphxmode</code> (OPTIONAL)</b> [Default <code>'DEFAULT'</code>] - Output mode of the glitched graphics
 >> This mode forces a specific output mode to be chosen. Valid arguments are <code>NES</code>, <code>SNES</code>, and <code>GB</code>. If you don't specify this, or put <code>null</code> or some other argument that isn't valid, the script will simply choose it's own randomly (the default behavior)
 
 > <b><code>$alphaborder</code> (OPTIONAL)</b> [Default <code>true</code>] - Adds a transparent border around the image
