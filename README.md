@@ -4,7 +4,7 @@ Create a glitched image from a sprite table in the style of NES, SNES, or Gamebo
 # What it is
 There are two functions written in PHP. One allows you to optimize a sprite table, and the other allows you to create a glitched image based on this sprite table. The resulting image looks like a glitched image from the NES, SNES, or Gameboy, generated with the limitations of each in mind.
 
-Please see <code>exampleoutput.png</code> if you want to see what this code makes, or you can view @ErrGraphics on Twitter to see my bot which uses this code.
+Please see <code>exampleoutput.png</code> if you want to see what this code makes, or you can view [@ErrGraphics](https://twitter.com/errgraphic) on Twitter to see my bot which uses this code.
 
 # What's contained?
 
@@ -15,46 +15,37 @@ Inside <code>glitchedimggen.php</code> there are two functions
 ### <code>spriteTableOpt()</code>
 This generates an optimizes sprite table and removes duplicate tiles from the table, to give a better overall result. It takes the following arguments:
 
-<b><code>$sourcetable</code></b> - Path to source sprite table
+><b><code>$sourcetable</code></b> - Path to source sprite table
+>> This is the path to the sprite table we'll be optimizing. It MUST be an 8x8 4 color image. Please see <code>example.png</code> for an example. If you open this in GIMP or Aseprite, you can easily add graphics to it.
 
-This is the path to the sprite table we'll be optimizing. It MUST be an 8x8 4 color image. Please see <code>example.png</code> for an example. If you open this in GIMP or Aseprite, you can easily add graphics to it.
+><b><code>$desttable</code></b> - Path to save optimized sprite table to
+>> This is where we will save the optmized sprite table to. Please see <code>exampleopt.png</code> for an example of what the sprite table will look like.
 
-<b><code>$desttable</code></b> - Path to save optimized sprite table to
+> <b><code>$trimbott</code> (OPTIONAL)</b> [Default <code>true</code>] - Trims the last row off
+>> This trims the last row off of the image. This can be useful because the last row will more than likely have excess blank tiles on it.
 
-This is where we will save the optmized sprite table to. Please see <code>exampleopt.png</code> for an example of what the sprite table will look like.
-
-<b><code>$trimbott</code> (OPTIONAL)</b> [Default <code>true</code>] - Trims the last row off
-
-This trims the last row off of the image. This can be useful because the last row will more than likely have excess blank tiles on it.
-
-<b><code>$tablecols</code> (OPTIONAL)</b> [Default <code>32</code>] - Width of the optimized sprite table, in columns
-
-This specifies the width of the resulting optimized sprite table. 
+> <b><code>$tablecols</code> (OPTIONAL)</b> [Default <code>32</code>] - Width of the optimized sprite table, in columns
+>> This specifies the width of the resulting optimized sprite table. 
 
 <b><code>Returns:</code> Nothing</b>
 
 ### <code>glitchedImgGen()</code>
 This function creates a glitched image based on the sprite table that we made with <code>spriteTableOpt()</code>. It takes the following arguments:
 
-<b><code>$spritetablepath</code></b> - Path to source sprite table
+> <b><code>$spritetablepath</code></b> - Path to source sprite table
+>> This is where we'll find the optimized sprite table. It should be composed of 8x8 tiles. This allows you to use this function multiple times with multiple sprite tables, if you so choose.
 
-This is where we'll find the optimized sprite table. It should be composed of 8x8 tiles. This allows you to use this function multiple times with multiple sprite tables, if you so choose.
+><b><code>$outputpath</code></b> - Path where we'll save the image.
+>> This is where we'll save the output glitched image. Please see <code>exampleoutput.png</code> for an example of what this code produces.
 
-<b><code>$outputpath</code></b>
+> <b><code>$upscalemult</code> (OPTIONAL)</b> [Default <code>3</code>] - How much we'll upscale the image
+>> This specifies how much we'll upscale the image. Set to 1 to have a 1:1 output ratio.
 
-This is where we'll save the output glitched image. Please see <code>exampleoutput.png</code> for an example of what this code produces.
+> <b><code>$gphxmode</code> (OPTIONAL)</b> [Default <code>'DEFAULT'</code></b> - Output mode of the glitched graphics
+>> This mode forces a specific output mode to be chosen. Valid arguments are <code>NES</code>, <code>SNES</code>, and <code>GB</code>. If you don't specify this, or put <code>null</code> or some other argument that isn't valid, the script will simply choose it's own randomly (the default behavior)
 
-<b><code>$upscalemult</code> (OPTIONAL)</b> [Default <code>3</code>] - How much we'll upscale the image
-
-This specifies how much we'll upscale the image. Set to 1 to have a 1:1 output ratio.
-
-<b><code>$gphxmode</code> (OPTIONAL)</b> [Default <code>'DEFAULT'</code></b> - Output mode of the glitched graphics
-
-This mode forces a specific output mode to be chosen. Valid arguments are <code>NES</code>, <code>SNES</code>, and <code>GB</code>. If you don't specify this, or put <code>null</code> or some other argument that isn't valid, the script will simply choose it's own randomly (the default behavior)
-
-<b><code>$alphaborder</code> (OPTIONAL)</b> [Default <code>true</code>] - Adds a transparent border around the image
-
-This adds a transparent border around the image. This is useful because Twitter automatically converts all PNGs to JPG if there is no transparency in the image. With a transparent border, it forces Twitter to keep it as a PNG. This allows people to download the image and the palette information will be retained.
+> <b><code>$alphaborder</code> (OPTIONAL)</b> [Default <code>true</code>] - Adds a transparent border around the image
+>> This adds a transparent border around the image. This is useful because Twitter automatically converts all PNGs to JPG if there is no transparency in the image. With a transparent border, it forces Twitter to keep it as a PNG. This allows people to download the image and the palette information will be retained.
 
 <b><code>Returns:</code> Nothing</b>
 
@@ -92,7 +83,7 @@ In Gameboy mode, it picks 4 colors from a prespecified table (please see <code>g
 
 # Questions?
 
-If you have any questions about this script, you can reach out to me either here or on Twitter at @FxSql. I hope that you enjoy this script!
+If you have any questions about this script, you can reach out to me either here or on Twitter at [@FxSql](https://twitter.com/fxsql). I hope that you enjoy this script!
 
 # Requirements
 It requires PHP 5.5 or PHP 7 with GD installed.
