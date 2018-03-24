@@ -16,7 +16,7 @@ You can also view [@ErrGraphic](https://twitter.com/errgraphic) on Twitter to se
 
 Inside <code>glitchedimggen.php</code> there are two functions
 
-### <code>spriteTableOpt()</code>
+### <code>spriteTableOpt($sourcetable, $desttable, $trimbott = true, $tablecols = 32)</code>
 This generates an optimizes sprite table and removes duplicate tiles from the table, to give a better overall result. It takes the following arguments:
 
 ><b><code>$sourcetable</code></b> - Path to source sprite table
@@ -45,7 +45,7 @@ This generates an optimizes sprite table and removes duplicate tiles from the ta
 
 > <b><code>Returns:</code> Nothing</b>
 
-### <code>glitchedImgGen()</code>
+### <code>glitchedImgGen($spritetablepath, $outputpath, $upscalemult = 3, $gphxmode = 'DEFAULT', $alphaborder = true)</code>
 This function creates a glitched image based on the sprite table that we made with <code>spriteTableOpt()</code>. It takes the following arguments:
 
 > <b><code>$spritetablepath</code></b> - Path to source sprite table
