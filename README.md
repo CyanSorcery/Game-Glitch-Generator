@@ -8,7 +8,7 @@ Here is an example of what the code does:
 
 ![Generated Image Example](exampleoutput.png)
 
-You can also view [@ErrGraphics](https://twitter.com/errgraphic) on Twitter to see my bot which uses this code.
+You can also view [@ErrGraphic](https://twitter.com/errgraphic) on Twitter to see my bot which uses this code.
 
 # What's contained?
 
