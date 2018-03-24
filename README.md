@@ -23,13 +23,17 @@ This generates an optimizes sprite table and removes duplicate tiles from the ta
 >
 > This is the path to the sprite table we'll be optimizing. It MUST be an 8x8 4 color image. If you open this in GIMP or Aseprite, you can easily add graphics to it. Here is an example:
 >
->![Example sprite table](example.png)
+> ![Example sprite table](example.png)
+>
+> Notice all the blank spaces. That's what this function will remove.
 
 ><b><code>$desttable</code></b> - Path to save optimized sprite table to
 >
 > This is where we will save the optmized sprite table to. Here is an example:
 >
->![Example optimized sprite table](exampleopt.png)
+> ![Example optimized sprite table](exampleopt.png)
+>
+> You can see all blank spaces and duplicate entries have been removed entirely.
 
 > <b><code>$trimbott</code> (OPTIONAL)</b> [Default <code>true</code>] - Trims the last row off
 >
@@ -57,7 +61,8 @@ This function creates a glitched image based on the sprite table that we made wi
 > This specifies how much we'll upscale the image. Set to 1 to have a 1:1 output ratio.
 
 > <b><code>$gphxmode</code> (OPTIONAL)</b> [Default <code>'DEFAULT'</code>] - Output mode of the glitched graphics
->> This mode forces a specific output mode to be chosen. Valid arguments are <code>NES</code>, <code>SNES</code>, and <code>GB</code>. If you don't specify this, or put <code>null</code> or some other argument that isn't valid, the script will simply choose it's own randomly (the default behavior)
+>
+> This mode forces a specific output mode to be chosen. Valid arguments are <code>NES</code>, <code>SNES</code>, and <code>GB</code>. If you don't specify this, or put <code>null</code> or some other argument that isn't valid, the script will simply choose it's own randomly (the default behavior)
 
 > <b><code>$alphaborder</code> (OPTIONAL)</b> [Default <code>true</code>] - Adds a transparent border around the image
 >
@@ -83,7 +88,9 @@ This is an example of what this code does. You can also visit my bot @ErrGraphic
 
 # About the output
 
-This outputs glitched images in NES, SNES, or Gameboy style, with the limitations of each in mind.
+This outputs glitched images in NES, SNES, or Gameboy style, with the limitations of each in mind. Each tile is sourced from an 8x8 part of the tileset produced by <code>spriteTableOpt()</code>. It has a chance of producing randomized pixels, to emulate the game reading from program ROM instead of graphics ROM. It also flips and rotates tiles, to add to the corruption. It also has a chance of ofsetting the sourced tile, so that it will read part of 4 tiles instead of just one from the tileset.
+
+Here is a description of the modes and their differences in output:
 
 ## NES Mode
 
