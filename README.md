@@ -88,7 +88,7 @@ This is an example of what this code does. You can also visit my bot @ErrGraphic
 
 # About the output
 
-This outputs glitched images in NES, SNES, or Gameboy style, with the limitations of each in mind. Each tile is sourced from an 8x8 part of the tileset produced by <code>spriteTableOpt()</code>. It has a chance of producing randomized pixels, to emulate the game reading from program ROM instead of graphics ROM. It also flips and rotates tiles, to add to the corruption. It also has a chance of ofsetting the sourced tile, so that it will read part of 4 tiles instead of just one from the tileset.
+This outputs glitched images in NES, SNES, or Gameboy style, with the limitations of each in mind. Each tile is sourced from an 8x8 part of the tileset produced by <code>spriteTableOpt()</code>. It has a chance of producing randomized pixels, to emulate the game reading from program ROM instead of graphics ROM. It also flips and rotates tiles, to add to the corruption. It also has a chance of offsetting the sourced tile, so that it will read part of 4 tiles instead of just one from the tileset.
 
 Here is a description of the modes and their differences in output:
 
