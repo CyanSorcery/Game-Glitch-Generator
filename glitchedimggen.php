@@ -215,8 +215,8 @@
 				}
 				
 				//create initial image
-				//NES resolution is 256x240, we create an image that's 16x16 bigger so that we can scroll it a bit
-				$img = imagecreate(256+16, 240+16);
+				//NES resolution is 256x240, we create an image that's 16x16 bigger so that we can scroll it a bit and 32x32 bigger for overscan effects
+				$img = imagecreate(256+48, 240+48);
 				$imgw = imagesx($img);
 				$imgh = imagesy($img);
 				
@@ -267,8 +267,8 @@
 				}
 				
 				//create initial image
-				//SNES resolution is also 256x240, we create an image that's 16x16 bigger so that we can scroll it a bit
-				$img = imagecreate(256+16, 240+16);
+				//SNES resolution is also 256x240, we create an image that's 16x16 bigger so that we can scroll it a bit and 32x32 for overscan effects
+				$img = imagecreate(256+48, 240+48);
 				$imgw = imagesx($img);
 				$imgh = imagesy($img);
 				
@@ -285,8 +285,8 @@
 			case 'GB':
 			{
 				//create initial image
-				//SNES resolution is also 256x240, we create an image that's 16x16 bigger so that we can scroll it a bit
-				$img = imagecreate(160+16, 144+16);
+				//SNES resolution is also 256x240, we create an image that's 16x16 bigger so that we can scroll it a bit and 32x32 for overscan effects
+				$img = imagecreate(160+48, 144+48);
 				$imgw = imagesx($img);
 				$imgh = imagesy($img);
 				
@@ -365,6 +365,8 @@
 						2 => IMG_FLIP_VERTICAL,
 						3 => IMG_FLIP_BOTH
 						);
+		
+		
 		
 		
 		//begin the obtuse process of drawing the image
@@ -525,6 +527,54 @@
 			}
 		}
 		
+		//figure out if we're gonna do cool effects or not
+		$cooleffects = mt_rand(0, 5);
+		switch ($cooleffects)
+		{
+			case 5:
+			{
+				//wave effect, like we're under water - can't be done on NES
+				switch ($mode)
+				{
+					case 'SNES':
+					case 'GB':
+					{
+						//create temporary buffer image to copy from
+						$buffer = imagecreate($imgw, $imgh);
+						imagepalettecopy($buffer, $img);
+		
+						//copy image to buffer
+						imagecopy($buffer, $img, 0, 0, 0, 0, $imgw, $imgh);
+						
+						//determine how big to make the wave effect, the stronger it is the more distorted it is
+						$sinestrength = mt_rand(1, 16);
+						
+						//the smaller the height, the less wavy it is
+						$sineheight = mt_rand(0, 30);
+						
+						//copy image back to main image, line by line
+						
+						/*
+							how this works:
+							-	First, divide the sine strength by 2
+							-	Next, we take $y and multiply it by 5 + the sine height
+								This tells us how many degrees we're going to offer to the sine wave
+							-	we then convert the degrees to radians, to pass to the sine
+							-	the sine returns between -1 and 1, so we multiply by the strength and then round
+						*/
+						
+						for ($y = 0; $y < $imgh; $y++)
+						{
+							$offset = round(($sinestrength/2) * sin(deg2rad($y * (5 + $sineheight))));
+							imagecopyresized($img, $buffer, $offset, $y, 0, $y, $imgw, 1, $imgw, 1);
+						}
+						
+						break;
+					}
+				}
+			}
+		}
+		
 		//which way are we gonna scroll and by how much
 		switch ($mode)
 		{
@@ -562,20 +612,20 @@
 			}
 		}
 		
-		
+		//crop an extra 16x16 (32x32 total) border to trim out overscan effects)
 		$cropped = imagecrop($img, Array(
-											'x' => $x, 
-											'y' => $y, 
-											'width' => $imgw - 16, 
-											'height' => $imgh - 16
+											'x' => $x+16, 
+											'y' => $y+16, 
+											'width' => $imgw - 32, 
+											'height' => $imgh - 32
 										)
 									);
 		
 		//do math on size if we're to create an alpha border or not
 		if ($alphaborder === true)
 		{
-			$upsizedw = ($imgw-16) * $upscalemult+2;
-			$upsizedh = ($imgh-16) * $upscalemult+2;
+			$upsizedw = ($imgw-48) * $upscalemult+2;
+			$upsizedh = ($imgh-48) * $upscalemult+2;
 			//top left offset
 			$bordoffset = 1;
 			//bottom right offset
@@ -583,8 +633,8 @@
 		}
 		else
 		{
-			$upsizedw = ($imgw-16) * $upscalemult;
-			$upsizedh = ($imgh-16) * $upscalemult;
+			$upsizedw = ($imgw-48) * $upscalemult;
+			$upsizedh = ($imgh-48) * $upscalemult;
 			$bordoffset = 0;
 			$shrinksize = 0;
 		}
@@ -609,7 +659,7 @@
 					/* dest coords */			$bordoffset, $bordoffset,
 					/* source coords */			0, 0,
 					/* dest widthheight */		$upsizedw - $shrinksize, $upsizedh - $shrinksize,
-					/* source widthheight */	$imgw - 16, $imgh - 16
+					/* source widthheight */	$imgw -48, $imgh - 48
 						);
 		
 		//imagepng($upsized, './tmp/glitched.png');
