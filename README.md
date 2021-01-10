@@ -82,6 +82,10 @@ Example image of what you can expect to see by using <code>spriteTableOpt()</cod
 
 This is an example of what this code does. You can also visit my bot @ErrGraphic on Twitter to see what it does.
 
+## <code>spriteetableopt.png</code>
+
+A more robust image to sample data from. This file features graphics from Shield Cat the Game, also by CyanSorcery.
+
 # About the output
 
 This outputs glitched images in NES, SNES, or Gameboy style, with the limitations of each in mind. Each tile is sourced from an 8x8 part of the tileset produced by <code>spriteTableOpt()</code>. It has a chance of producing randomized pixels, to emulate the game reading from program ROM instead of graphics ROM. It also flips and rotates tiles, to add to the corruption. It also has a chance of offsetting the sourced tile, so that it will read part of 4 tiles instead of just one from the tileset.
