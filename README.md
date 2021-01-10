@@ -106,7 +106,7 @@ In Gameboy mode, it picks 4 colors from a prespecified table (please see <code>g
 
 # Questions?
 
-If you have any questions about this script, you can reach out to me either here or on Twitter at [@FxSql](https://twitter.com/fxsql). I hope that you enjoy this script!
+If you have any questions about this script, you can reach out to me either here or on Twitter at [@CyanSorcery](https://twitter.com/CyanSorcery). I hope that you enjoy this script!
 
 # Requirements
 It requires PHP 5.5 or PHP 7 with GD installed.
