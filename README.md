@@ -45,28 +45,24 @@ This generates an optimizes sprite table and removes duplicate tiles from the ta
 
 > <b><code>Returns:</code> Nothing</b>
 
-### <code>glitchedImgGen($spritetablepath, $outputpath, $upscalemult = 3, $gphxmode = 'DEFAULT', $alphaborder = true)</code>
+### <code>glitched_img_gen($gfx_table_path, $output_path, $scale = 3, $mode_switch = 'DEFAULT')</code>
 This function creates a glitched image based on the sprite table that we made with <code>spriteTableOpt()</code>. It takes the following arguments:
 
-> <b><code>$spritetablepath</code></b> - Path to source sprite table
+> <b><code>$gfx_table_path</code></b> - Path to source sprite table
 >
 > This is where we'll find the optimized sprite table. It should be composed of 8x8 tiles. This allows you to use this function multiple times with multiple sprite tables, if you so choose.
 
-><b><code>$outputpath</code></b> - Path where we'll save the image.
+><b><code>$output_path</code></b> - Path where we'll save the image.
 >
 > This is where we'll save the output glitched image. At the top of this README is an example of what this code outputs.
 
-> <b><code>$upscalemult</code> (OPTIONAL)</b> [Default <code>3</code>] - How much we'll upscale the image
+> <b><code>$scale</code> (OPTIONAL)</b> [Default <code>3</code>] - How much we'll upscale the image
 >
 > This specifies how much we'll upscale the image. Set to 1 to have a 1:1 output ratio.
 
-> <b><code>$gphxmode</code> (OPTIONAL)</b> [Default <code>'DEFAULT'</code>] - Output mode of the glitched graphics
+> <b><code>$mode_switch</code> (OPTIONAL)</b> [Default <code>'DEFAULT'</code>] - Output mode of the glitched graphics
 >
 > This mode forces a specific output mode to be chosen. Valid arguments are <code>NES</code>, <code>SNES</code>, and <code>GB</code>. If you don't specify this, or put <code>null</code> or some other argument that isn't valid, the script will simply choose it's own randomly (the default behavior)
-
-> <b><code>$alphaborder</code> (OPTIONAL)</b> [Default <code>true</code>] - Adds a transparent border around the image
->
-> This adds a transparent border around the image. This is useful because Twitter automatically converts all PNGs to JPG if there is no transparency in the image. With a transparent border, it forces Twitter to keep it as a PNG. This allows people to download the image and the palette information will be retained.
 
 > <b><code>Returns:</code> Nothing</b>
 
@@ -85,6 +81,10 @@ Example image of what you can expect to see by using <code>spriteTableOpt()</cod
 ## <code>exampleoutput.png</code>
 
 This is an example of what this code does. You can also visit my bot @ErrGraphic on Twitter to see what it does.
+
+## <code>spriteetableopt.png</code>
+
+A more robust image to sample data from. This file features graphics from Shield Cat the Game, also by CyanSorcery.
 
 # About the output
 
