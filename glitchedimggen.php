@@ -1,772 +1,441 @@
 <?php
+
+/*
+	NES/SNES/GB Glitched Image Generator
+	
+	Copyright (C) 2021 CyanSorcery
+	
+	Generates a glitched image in the style of an old game console.
+	
+*/
+
+//Include palette functions
+require('glitchedfunct.php');
+
+function glitched_img_gen($gfx_table_path, $output_path, $scale = 4, $mode_switch = 'RAND')
+{
 	/*
-		NES/SNES/GB Glitched Image generator
+		Function that generates the glitched images
 		
-		glitchedImgGen()
-			Arguments:
-				$spritetablepath		= Path to the sprite table we'll be using, SHOULD be 8x8 (if not maybe you'll get cool glitches)
-				$outputpath				= Path we'll save the image to
-				$upscalemult			= OPTIONAL How much we'll upscale the image (defaults to 3)
-				$gphxmode				= OPTIONAL Graphics mode we'll use, or it just picks one
-				$alphaborder			= Put a transparent border around it (useful for Twitter, defaults to True
-			Returns:
-				nothing
+		Arguments:
+			$gfx_table_path			= Path to the graphics table we'll be sampling from
+			$output_path 			= Location where the file will be saved
+			$scale					= (Optional) (Default: 4) How much to upscale the final image
+			$mode_switch			= (Optional) (Default: random) What graphics mode to use
+		Returns:
+			nothing
 	*/
 	
-	function glitchedImgGen($spritetablepath, $outputpath, $upscalemult = 3, $gphxmode = 'DEFAULT', $alphaborder = true)
-	{
-		//mode switch
-		$modes = Array('NES', 'SNES', 'GB');
-		
-		//check if the graphics mode is in our supported modes and if not just pick one
-		if (in_array($gphxmode, $modes))
-		{
-			$mode = $gphxmode;
-		}
-		else
-		{
-			$mode = $modes[mt_rand(0,2)];
-		}
-		
-		//store NES color palette, stored in RGB hex (later converted to 0-255, for PHP color args)
-		$nescol = Array();
-		$nescol[] = '666666';
-		$nescol[] = 'ADADAD';
-		$nescol[] = 'FFFFFF';
-		$nescol[] = '002A88';
-		$nescol[] = '155FD9';
-		$nescol[] = '64B0FF';
-		$nescol[] = 'C0DFFF';
-		$nescol[] = '1412A7';
-		$nescol[] = '4240FF';
-		$nescol[] = '9290FF';
-		$nescol[] = 'D3D2FF';
-		$nescol[] = '3B00A4';
-		$nescol[] = '7527FE';
-		$nescol[] = 'C676FF';
-		$nescol[] = 'E8C8FF';
-		$nescol[] = '5C007E';
-		$nescol[] = 'A01ACC';
-		$nescol[] = 'F26AFF';
-		$nescol[] = 'FAC2FF';
-		$nescol[] = '6E0040';
-		$nescol[] = 'B71E7B';
-		$nescol[] = 'FF6ECC';
-		$nescol[] = 'FFC4EA';
-		$nescol[] = '6C0700';
-		$nescol[] = 'B53210';
-		$nescol[] = 'FF8170';
-		$nescol[] = '561D00';
-		$nescol[] = '994E00';
-		$nescol[] = 'EA9E22';
-		$nescol[] = 'F7D8A5';
-		$nescol[] = '333500';
-		$nescol[] = '6B6D00';
-		$nescol[] = 'BCBE00';
-		$nescol[] = 'E4E594';
-		$nescol[] = '0C4800';
-		$nescol[] = '388700';
-		$nescol[] = '88D800';
-		$nescol[] = 'CFEF96';
-		$nescol[] = '005200';
-		$nescol[] = '0D9300';
-		$nescol[] = '5CE430';
-		$nescol[] = 'BDF4AB';
-		$nescol[] = '004F08';
-		$nescol[] = '008F32';
-		$nescol[] = '34E082';
-		$nescol[] = '3BF3CC';
-		$nescol[] = '00404D';
-		$nescol[] = '007C8D';
-		$nescol[] = '48CDDE';
-		$nescol[] = '000000';
-		$nescol[] = '4F4F4F';
-		$nescol[] = 'B8B8B8';
-		
-		//Gameboy color palette
-		//colors are stored in RRGGBB format, with 4 colors each, starting with the brightest color
-		
-		$palettegrid = Array();
-		$palettegrid['GB'] = '9BBC0F7DA4003062300F380F';
-		
-		$palettegrid['SGB1'] = Array();
-		$palettegrid['SGB1']['A'] = 'F8E8C8D89048A82820301850';
-		$palettegrid['SGB1']['B'] = 'D8D8C0C8B070B05010000000';
-		$palettegrid['SGB1']['C'] = 'F8C0F8E89850983860383898';
-		$palettegrid['SGB1']['D'] = 'F8F8A8C08048F80000501800';
-		$palettegrid['SGB1']['E'] = 'F8D8B078C078688840583820';
-		$palettegrid['SGB1']['F'] = 'D8E8F8E08850A80000004010';
-		$palettegrid['SGB1']['G'] = '00005000A0E8787800F8F858';
-		$palettegrid['SGB1']['H'] = 'F8E8E0F8B888804000301800';
-		
-		$palettegrid['SGB2'] = Array();
-		$palettegrid['SGB2']['A'] = 'F0C8A0C08848287800000000';
-		$palettegrid['SGB2']['B'] = 'F8F8F8F8E850F83000500058';
-		$palettegrid['SGB2']['C'] = 'F8C0F8E888887830E8282898';
-		$palettegrid['SGB2']['D'] = 'F8F8A000F800F83000000050';
-		$palettegrid['SGB2']['E'] = 'F8C88090B0E0281060100810';
-		$palettegrid['SGB2']['F'] = 'D0F8F8F89050A00000180000';
-		$palettegrid['SGB2']['G'] = '68B838E05040E0B880001800';
-		$palettegrid['SGB2']['H'] = 'F8F8F8B8B8B8707070000000';
-		
-		$palettegrid['SGB3'] = Array();
-		$palettegrid['SGB3']['A'] = 'F8D09870C0C0F86028304860';
-		$palettegrid['SGB3']['B'] = 'D8D8C0E08020005000001010';
-		$palettegrid['SGB3']['C'] = 'E0A8C8F8F87800B8F8202058';
-		$palettegrid['SGB3']['D'] = 'F0F8B8E0A87808C800000000';
-		$palettegrid['SGB3']['E'] = 'F8F8C0E0B068B07820504870';
-		$palettegrid['SGB3']['F'] = '7878C8F868F8F8D000404040';
-		$palettegrid['SGB3']['G'] = '60D850F8F8F8C83038380000';
-		$palettegrid['SGB3']['H'] = 'E0F8A078C838488818081800';
-		
-		$palettegrid['SGB4'] = Array();
-		$palettegrid['SGB4']['A'] = 'F0A86878A8F8D000D0000078';
-		$palettegrid['SGB4']['B'] = 'F0E8F0E8A060407838180808';
-		$palettegrid['SGB4']['C'] = 'F8E0E0D8A0D098A0E0080000';
-		$palettegrid['SGB4']['D'] = 'F8F8B890C8C8486878082048';
-		$palettegrid['SGB4']['E'] = 'F8D8A8E0A878785888002030';
-		$palettegrid['SGB4']['F'] = 'B8D0D0D880D88000A0380000';
-		$palettegrid['SGB4']['G'] = 'B0E018B82058381000281000';
-		$palettegrid['SGB4']['H'] = 'F8F8C8B8C058808840405028';
-		
-		$palettegrid['GBC1'] = Array();
-		$palettegrid['GBC1']['UP'] = 'FFFFFFFFAD63833100000000';
-		$palettegrid['GBC1']['UPA'] = 'FFFFFFFF8584943A3A000000';
-		$palettegrid['GBC1']['UPB'] = 'FFE7C5CC9C85846B29000000';
-		
-		$palettegrid['GBC2'] = Array();
-		$palettegrid['GBC2']['LEFT'] = 'FFFFFF65A49B0000FE000000';
-		$palettegrid['GBC2']['LEFTA'] = 'FFFFFF8B8CDE53528C000000';
-		$palettegrid['GBC2']['LEFTB'] = 'FFFFFFA5A5A5525252000000';
-		
-		$palettegrid['GBC3'] = Array();
-		$palettegrid['GBC3']['DOWN'] = 'FFFFA5FE94949394FE000000';
-		$palettegrid['GBC3']['DOWNA'] = 'FFFFFFFFFF00FE0000000000';
-		$palettegrid['GBC3']['DOWNB'] = 'FFFFFFFFFF007D4900000000';
+	//Supported modes
+	$modes			= Array('NES', 'SNES', 'GB');
 	
-		$palettegrid['GBC4'] = Array();
-		$palettegrid['GBC4']['RIGHT'] = 'FFFFFF51FF00FF4200000000';
-		$palettegrid['GBC4']['RIGHTA'] = 'FFFFFF7BFF300163C6000000';
-		$palettegrid['GBC4']['RIGHTB'] = '000000008486FFDE00FFFFFF';
-		
-		$palettegrid['INVERT'] = Array();
-		$palettegrid['INVERT']['0'] = 'F4E1E1D17676297E7F0A2020';
-		$palettegrid['INVERT']['1'] = 'F4EBE2D1A37729537F0A1520';
-		$palettegrid['INVERT']['2'] = 'F4F4E2D1D07729297F0A0A20';
-		$palettegrid['INVERT']['3'] = 'EBF4E2A6D17753297F150A20';
-		$palettegrid['INVERT']['4'] = 'E2F4E279D1777E297F200A20';
-		$palettegrid['INVERT']['5'] = 'E2F4EB77D1A17F2956200A15';
-		$palettegrid['INVERT']['6'] = 'E2F4F477D1CD7F292B200A0A';
-		$palettegrid['INVERT']['7'] = 'E2EBF477A8D17F512920150A';
-		$palettegrid['INVERT']['8'] = 'E2E2F4777CD17F7C2920200A';
-		$palettegrid['INVERT']['9'] = 'EBE2F49F77D1587F2915200A';
-		$palettegrid['INVERT']['A'] = 'F4E2F4CB77D12D7F290A200A';
-		$palettegrid['INVERT']['B'] = 'F4E2EBD177AA297F4F0A2015';
-		
-		$palettegrid['RAINBOW'] = Array();
-		$palettegrid['RAINBOW']['0'] = 'F4E1E1D176767F292B200A0A';
-		$palettegrid['RAINBOW']['1'] = 'F4EBE2D1A3777F512920150A';
-		$palettegrid['RAINBOW']['2'] = 'F4F4E2D1D0777F7C2920200A';
-		$palettegrid['RAINBOW']['3'] = 'EBF4E2A6D177587F2915200A';
-		$palettegrid['RAINBOW']['4'] = 'E2F4E279D1772D7F290A200A';
-		$palettegrid['RAINBOW']['5'] = 'E2F4EB77D1A1297F4F0A2015';
-		$palettegrid['RAINBOW']['6'] = 'E2F4F477D1CD297E7F0A2020';
-		$palettegrid['RAINBOW']['7'] = 'E2EBF477A8D129537F0A1520';
-		$palettegrid['RAINBOW']['8'] = 'E2E2F4777CD129297F0A0A20';
-		$palettegrid['RAINBOW']['9'] = 'EBE2F49F77D153297F150A20';
-		$palettegrid['RAINBOW']['A'] = 'F4E2F4CB77D17E297F200A20';
-		$palettegrid['RAINBOW']['B'] = 'F4E2EBD177AA7F2956200A15';
-		
-		//rgb used to have r g b for each array, hex stores the hex code picked that time
-		$rgb = Array('r','g','b');
-		$hex = '';
-		
-		switch ($mode)
+	//Is the passed mode a valid mode? if not, simply pick one
+	if (in_array($mode_switch, $modes))
+		$mode = $mode_switch;
+	else
+		$mode = $modes[mt_rand(0, count($modes) - 1)];
+	
+	//Get the appropriate palette for our mode
+	//Palette format is as follows:
+	//		[pal_index][col_index][r, g, b, a]
+	
+	switch ($mode)
+	{
+		case 'NES':
 		{
-			case 'NES':
-			{
-				//figure out our NES Palette count for the image
-				$nescolsize = count($nescol) - 1;
-				
-				//palette index, NES can have 4
-				$nespal = Array();
-				for ($i = 0; $i < 4; $i ++)
-				{
-					$nespal[$i] = Array();
-					
-					//subpal index (each one can have 3 colors + BG)
-					for ($j = 0; $j < 3; $j++)
-					{
-						$hex = $nescol[mt_rand(0, $nescolsize)];
-						//color for this index
-						for ($k = 0; $k < 3; $k++)
-						{
-							$nespal[$i][$j][$rgb[$k]] = round(base_convert(substr($hex, $k * 2, 2), 16, 10));
-						}
-					}
-				}
-				$nesbgcol = Array();
-				
-				$hex = $nescol[mt_rand(0, $nescolsize)];
-				
-				for ($j = 0; $j < 3; $j++)
-				{
-					$nesbgcol[$rgb[$j]] = round(base_convert(substr($hex, $j * 2, 2), 16, 10));
-				}
-				
-				//create initial image
-				//NES resolution is 256x240, we create an image that's 16x16 bigger so that we can scroll it a bit and 32x32 bigger for overscan effects
-				$img = imagecreate(256+48, 240+48);
-				$imgw = imagesx($img);
-				$imgh = imagesy($img);
-				
-				//allocate the background color FIRST, automatically fills the image with this color
-				//it is an indexed image so dont have to worry about storing the color identifier, as we know it already
-				imagecolorallocate($img, $nesbgcol['r'], $nesbgcol['g'], $nesbgcol['b']);
-				
-				//allocate each color
-				for ($i = 0; $i < 4; $i++)
-				{
-					for ($j = 0; $j < 3; $j++)
-					{
-						imagecolorallocate($img, $nespal[$i][$j]['r'], $nespal[$i][$j]['g'], $nespal[$i][$j]['b']);
-					}
-				}
-				
-				break;
-			}
-			case 'SNES':
-			{
-				//palette index. Using MODE 1 of the SNES with 2 BGs of 16 colors and 1BG of 4 colors (only using the 2BGs in this case)
-				$snespal = Array();
-				for ($i = 0; $i < 2; $i ++)
-				{
-					$snespal[$i] = Array();
-					
-					//subpal index. SNES uses 15bit INTs with 5bits per color, for 32 possible values on each of the R G B
-					//we multiply by 8 to get a range of 256, and then take one off if it's greater than 255
-					//each palette can have 16 colors
-					for ($j = 0; $j < 16; $j++)
-					{
-						//color for this index
-						for ($k = 0; $k < 3; $k++)
-						{
-							$snestmpcol = mt_rand(0, 32) * 8;
-							if ($snestmpcol >=256)
-							{
-								$snestmpcol = 255;
-							}
-							$snespal[$i][$j][$rgb[$k]] = $snestmpcol;
-						}
-					}
-				}
-				$snesbgcol = Array();
-				for ($j = 0; $j < 3; $j++)
-				{
-					$snesbgcol[$rgb[$j]] = mt_rand(0, 255);
-				}
-				
-				//create initial image
-				//SNES resolution is also 256x240, we create an image that's 16x16 bigger so that we can scroll it a bit and 32x32 for overscan effects
-				$img = imagecreate(256+48, 240+48);
-				$imgw = imagesx($img);
-				$imgh = imagesy($img);
-				
-				//allocate each color
-				for ($i = 0; $i < 2; $i++)
-				{
-					for ($j = 0; $j < 16; $j++)
-					{
-						imagecolorallocate($img, $snespal[$i][$j]['r'], $snespal[$i][$j]['g'], $snespal[$i][$j]['b']);
-					}
-				}
-				break;
-			}
-			case 'GB':
-			{
-				//create initial image
-				//SNES resolution is also 256x240, we create an image that's 16x16 bigger so that we can scroll it a bit and 32x32 for overscan effects
-				$img = imagecreate(160+48, 144+48);
-				$imgw = imagesx($img);
-				$imgh = imagesy($img);
-				
-				$pallete = '';
-				
-				//pick one of the palettes from above and generate a palette based on it
-				$randkey = array_rand($palettegrid);
-				if ($randkey != 'GB')
-				{
-					$randkey2 = array_rand($palettegrid[$randkey]);
-					$palette = $palettegrid[$randkey][$randkey2];
-				}
-				else
-				{
-					$palette = $palettegrid[$randkey];
-				}
-				
-				for ($colindex = 1; $colindex < 5; $colindex++)
-				{
-					for ($colpos = 0; $colpos < 3; $colpos++)
-					{
-						
-						
-						$tmpnum = round(base_convert(substr($palette, ($colindex-1)*6+($colpos*2), 2), 16, 10));
-						
-						switch ($colpos)
-						{
-							case 0:
-							{
-								$red = $tmpnum;
-								break;
-							}
-							case 1:
-							{
-								$green = $tmpnum;
-								break;
-							}
-							case 2:
-							{
-								$blue = $tmpnum;
-								break;
-							}
-						}
-					}
-					
-					
-					imagecolorallocate($img, $red, $green, $blue);
-				}
-				
-				
-				
-				break;
-			}
+			$our_pal			= get_nes_palette();
+			$rand_spr_count		= mt_rand(3, 8);
+			$obj_max_size		= 3;
+			$screen_w			= 256;
+			$screen_h			= 240;
+			break;
 		}
 		
-		
-		
-		
-		//get our sprite table
-		$spritetable = imagecreatefrompng($spritetablepath);
-		$sprw = imagesx($spritetable);
-		$sprh = imagesy($spritetable);
-		//the amount of sprites rows and columns
-		$sprrows = ceil($sprh / 8);
-		$sprcols = ceil($sprw / 8);
-		
-		//current sprite that we'll work with on each draw
-		$sprite = imagecreate(8, 8);
-		
-		//copy palette from the sprite table to the sprite for ease
-		imagepalettecopy($sprite, $spritetable);
-		
-		//flip modes, offset by 1 for ease of use by the script later
-		$flipmodes = Array(
-						1 => IMG_FLIP_HORIZONTAL,
-						2 => IMG_FLIP_VERTICAL,
-						3 => IMG_FLIP_BOTH
-						);
-		
-		
-		
-		
-		//begin the obtuse process of drawing the image
-		//draw it in 16 by 16 chunks, assigning one of the palettes to each
-		for ($imgy = 0; $imgy < $imgh; $imgy+=16)
+		case 'SNES':
 		{
-			for ($imgx = 0; $imgx < $imgw; $imgx+=16)
+			$our_pal			= get_snes_palette();
+			$rand_spr_count		= mt_rand(3, 12);
+			$obj_max_size		= 4;
+			$screen_w			= 256;
+			$screen_h			= 240;
+			break;
+		}
+		
+		case 'GB':
+		{
+			$our_pal			= get_gb_palette();
+			$rand_spr_count		= mt_rand(3, 8);
+			$obj_max_size		= 3;
+			$screen_w			= 160;
+			$screen_h			= 144;
+			break;
+		}
+	}
+	
+	//Get our graphics table
+	$graphics_table		= imagecreatefrompng($gfx_table_path);
+	$graphics_table_w	= imagesx($graphics_table);
+	$graphics_table_h	= imagesy($graphics_table);
+	
+	//How many cells this is
+	$graphics_cells_x	= floor($graphics_table_w / 8);
+	$graphics_cells_y	= floor($graphics_table_h / 8);
+	
+	//Create an image which will replicate the RAM of the console
+	//Designed to fit 512 8x8 tiles total
+	$tile_table			= imagecreate(256, 128);
+	$tile_table_w		= imagesx($tile_table);
+	$tile_table_h		= imagesy($tile_table);
+	
+	//Copy the palette from the graphics table to our tile table
+	imagepalettecopy($tile_table, $graphics_table);
+	
+	//Convert the tile table to true color and then back
+	//This randomizes the color palettes
+	//imagepalettetotruecolor($tile_table);
+	//imagetruecolortopalette($tile_table, false, 255);
+	
+	//Possible flip modes
+	$flipmodes = Array(
+				1 => IMG_FLIP_HORIZONTAL,
+				2 => IMG_FLIP_VERTICAL,
+				3 => IMG_FLIP_BOTH
+				);
+	
+	//A single sprite
+	$single_sprite		= imagecreate(8, 8);
+	imagepalettecopy($single_sprite, $tile_table);
+	
+	//Copy random bits of the graphics table into our tile table
+	//It's possible but unlikely that this code can copy the same chunk of graphics multiple
+	//times, but due to the randomization of this all, it shouldn't be noticeable
+	for ($x = 0; $x < $tile_table_w; $x+=8)
+	{
+		for ($y = 0; $y < $tile_table_h; $y+=8)
+		{
+			//Random chance of it just being a garbage tile
+			if (mt_rand(0, 10) > 8)
 			{
-				//for this chunk, figure out 4 sprites to draw to it
-				
-				//what palette will we use
-				switch ($mode)
+				//Generate garbage tile, replicates when games use code as tile graphics
+				for ($garbage_x = $x; $garbage_x < $x + 8; $garbage_x++)
 				{
-					case 'NES':
+					for ($garbage_y = $y; $garbage_y < $y + 8; $garbage_y++)
 					{
-						//NES has 4 palettes we can use
-						$ourpal = mt_rand(0, 3);
-						break;
-					}
-					case 'SNES':
-					{
-						//SNES background has only two palettes one for each
-						$ourpal = mt_rand(0, 1);
-						break;
-					}
-					case 'GB':
-					{
-						//Gameboy only has one palette
-						$ourpal = 0;
-						break;
+						imagesetpixel($tile_table, $garbage_x, $garbage_y, mt_rand(0, 3));
 					}
 				}
+			}
+			else
+			{
+				//Copy the tile to the single sprite
+				imagecopy($single_sprite, $graphics_table, 0, 0, mt_rand(0, $graphics_cells_x - 1) * 8, mt_rand(0, $graphics_cells_y - 1), 8, 8);
 				
+				//Do we flip it?
+				$flip_mode = mt_rand(0, 3);
 				
-				//chance for it to be offset
-				$chance = mt_rand(4, 9);
+				if ($flip_mode > 0)
+					imageflip($single_sprite, $flip_mode);
 				
-				for ($drawx = 0; $drawx < 16; $drawx+=8)
+				//Copy it to the actual table
+				imagecopy($tile_table, $single_sprite, $x, $y, 0, 0, 8, 8);
+			}
+		}
+	}
+	
+	//Get rid of the graphics table as we don't need it now
+	imagedestroy($graphics_table);
+	imagedestroy($single_sprite);
+	
+	//Write the RAM image for debugging
+	//imagepng($tile_table, 'chrmap.png');
+	
+	//Create an image on which we'll load graphics data. We'll sample a random chunk of it
+	$padding			= 64;		//MUST be multiple of 8
+	$fin_img			= imagecreate(256+$padding, 256+$padding);
+	$finimg_w			= imagesx($fin_img);
+	$finimg_h			= imagesy($fin_img);
+	$padding_tiles		= floor($padding / 8);
+	$finimg_tiles_w		= floor($finimg_w / 8);
+	$finimg_tiles_h		= floor($finimg_h / 8);
+	
+	//Draw the background color to our image
+	$rand_pal			= $our_pal[array_rand($our_pal)];
+	
+	$bg_col_arr			= $rand_pal[mt_rand(0, count($rand_pal) - 2)];		//Last index is always transparency
+	
+	//Allocate the BG color (automatically draws it)
+	imagecolorallocate($fin_img, $bg_col_arr['r'], $bg_col_arr['g'], $bg_col_arr['b']);
+	
+	//Convert this to a true color image from now on
+	//imagepalettetotruecolor($fin_img);
+	
+	//Go through our color array and replace the RGBA values with the
+	//palette index from imagecolorallocate
+	foreach ($our_pal as $palkey => $palette)
+	{
+		foreach ($palette as $colkey => $color)
+		{
+			$our_pal[$palkey][$colkey]['palind'] = imagecolorallocate($fin_img, $color['r'], $color['g'], $color['b']);
+		}
+	}
+	
+	//Put a background on the image?
+	if (mt_rand(0, 5) > 1)
+	{
+		
+		//Get a palette
+		$tile_pal			= $our_pal[mt_rand(0, count($our_pal) - 1)];
+				
+		$tile_id		= mt_rand(0, 511);
+		
+		//Figure out where in the table we sample the tile from
+		$tile_sample_x		= $tile_id % 64;
+		$tile_sample_y		= floor($tile_id / 64);
+		
+		for ($finimg_x = 0; $finimg_x < $finimg_tiles_w; $finimg_x++)
+		{
+			for ($finimg_y = 0; $finimg_y < $finimg_tiles_h; $finimg_y++)
+			{
+				//Draw the tile to the final image
+				for ($tile_x = 0; $tile_x < 8; $tile_x++)
 				{
-					for ($drawy = 0; $drawy < 16; $drawy+=8)
+					for ($tile_y = 0; $tile_y < 8; $tile_y++)
 					{
-						//fetch a sprite
-						imagecopy(
-								/* dest image */				$sprite,
-								/* source (sprite table) */		$spritetable,
-								/* destination x and y */		0, 0,
-								/* source x */					mt_rand(0, $sprcols) * 8 + ($chance == 9 ? mt_rand(0, 7) : 0),
-								/* source y */					mt_rand(0, $sprrows) * 8 + ($chance == 9 ? mt_rand(0, 7) : 0),
-								/* size */						8, 8);
+						//Get the color index at this position (subtract 1 to it to account for the background color)
+						$col_ind		= max(0, imagecolorat($tile_table, $tile_sample_x + $tile_x, $tile_sample_y + $tile_y));
 						
-						//will we flip it?
-						$toflip = mt_rand(0, 3);
-						if ($toflip > 0)
+						//Write the color to this position if it's not transparent
+						if ($tile_pal[$col_ind]['a'] > 0)
 						{
-							imageflip($sprite, $flipmodes[$toflip]);
+							imagesetpixel($fin_img, ($finimg_x * 8) + $tile_x, ($finimg_y * 8) + $tile_y, ($col_ind * 4) + $tile_pal[$col_ind]['palind']);
 						}
+					}
+				}
+			}
+		}
+	}
+	
+	//Get our level data
+	$level_data			= load_nova_level();
+	
+	//What is the width and height of our level data?
+	$level_width		= count($level_data[0]);
+	$level_height		= count($level_data[0][0]);
+	
+	//Figure out our base offset (can be up to $padding_tiles tiles outside the boundary, will be filled with randomization
+	
+	if (mt_rand(0, 10) > 7)
+	{
+		$base_offset_x		= floor(mt_rand(-(128 / 8), $level_width));
+		$base_offset_y		= floor(mt_rand(-(128 / 8), $level_height));
+	}
+	else
+	{
+		$base_offset_x		= mt_rand(0, $level_width - 16);
+		$base_offset_y		= mt_rand(0, $level_height - 15);
+	}
+	
+	$layer_curr			= 0;
+	$layer_max			= count($level_data);
 						
-						//rotate it (maybe) third argument is the background color which is index 0
-						imagerotate($sprite, mt_rand(0, 3) * 90, 0);
-						
-						//convert image back to palette based since these functions change it
-						//this will mess up the indexes but that's ok
-						imagetruecolortopalette($sprite, false, 4);
-						imagepalettecopy($sprite, $spritetable);
-						
-						//figure out which palette entries we're gonna be drawing
-						//we do this by creating an array, shuffling it, and then popping off one entry
-						switch ($mode)
-						{
-							case 'NES':
-							{
-								//array representing which palette to use
-								$todraw = Array(0, 1, 2, 3);
-								//figure out the transparent color
-								shuffle($todraw);
-								array_pop($todraw);
-								break;
-							}
-							case 'SNES':
-							{
-								//offset for this sprite
-								$offset = mt_rand(0, 12);
-								break;
-							}
-							case 'GB':
-							{
-								//array representing which palette to use
-								$todraw = Array(0, 1, 2, 3);
-								break;
-							}
-						}
-						
-						//give it a 1 in 10 chance of being just garbled 
-						$chance = mt_rand(0, 9);
+	//Go through data for each layer
+	foreach ($level_data as $layer)
+	{
+		
+		//Reset the offsets
+		$offset_x			= $base_offset_x;
+		$offset_y			= $base_offset_y;
+	
+		//Draw tiles to the image, assigning a random palette to each tile (draw them in 16x16 chunks)
+		for ($finimg_x = 0; $finimg_x < $finimg_tiles_w; $finimg_x+=2)
+		{
+			for ($finimg_y = 0; $finimg_y < $finimg_tiles_h; $finimg_y+=2)
+			{
+				//Get a palette
+				$tile_pal			= $our_pal[mt_rand(0, count($our_pal) - 1)];
 				
-						//now that we've messed with it, draw it
-						for ($sprdrawy = 0; $sprdrawy < 8; $sprdrawy++)
+				//Micro tile offset
+				for ($microtile_x = 0; $microtile_x < 2; $microtile_x++)
+				{
+					for ($microtile_y = 0; $microtile_y < 2; $microtile_y++)
+					{
+						//Is this out of bounds? If so, get a random tile. If not, fetch a tile ID from the level data
+						if ($offset_x + $microtile_x < 0 || $offset_x + $microtile_x >= $level_width - 1 || $offset_y + $microtile_y < 0 || $offset_y + $microtile_y >= $level_height - 1)
 						{
-							for ($sprdrawx = 0; $sprdrawx < 8; $sprdrawx++)
-							{
-								//get the index
-								if ($chance == 9)
-								{
-									$colind = mt_rand(0,3);
-								}
-								else
-								{
-									$colind = imagecolorat($sprite, $sprdrawx, $sprdrawy);
-								}
-								
-								//draw it onto the image
-								switch ($mode)
-								{
-									case 'NES':
-									{
-										//check if we're drawing this index
-										if (in_array($colind, $todraw))
-										{
-											imagesetpixel(
-												/* dest image */			$img,
-												/* x coord */				$imgx + $drawx + $sprdrawx,
-												/* y coord */				$imgy + $drawy + $sprdrawy,
-												/* color palette index */	1 + ($ourpal * 3) + array_search($colind, $todraw)
-												/* relative to dest pal*/
-												);
-										}
-										break;
-									}
-									case 'SNES':
-									{
-										imagesetpixel(
-											/* dest image */			$img,
-											/* x coord */				$imgx + $drawx + $sprdrawx,
-											/* y coord */				$imgy + $drawy + $sprdrawy,
-											/* color palette index */	($ourpal * 16) + ($colind + $offset)
-											/* relative to dest pal*/
-											);
-										break;
-									}
-									case 'GB':
-									{
-										imagesetpixel(
-											/* dest image */			$img,
-											/* x coord */				$imgx + $drawx + $sprdrawx,
-											/* y coord */				$imgy + $drawy + $sprdrawy,
-											/* color palette index */	$colind
-											/* relative to dest pal*/
-											);
-									}
-								}
-								
+							$tile_id		= mt_rand(0, 511);
+						}
+						else
+						{
+							$tile_id		= $layer[$offset_x + $microtile_x][$offset_y + $microtile_y];
+						}
+						
+						//If the tile ID is 0, don't do anything
+						if ($tile_id > 0)
+						{
 							
-								
+							//Figure out where in the table we sample the tile from
+							$tile_sample_x		= $tile_id % 64;
+							$tile_sample_y		= floor($tile_id / 64);
+							
+							//Draw the tile to the final image
+							for ($tile_x = 0; $tile_x < 8; $tile_x++)
+							{
+								for ($tile_y = 0; $tile_y < 8; $tile_y++)
+								{
+									//Get the color index at this position (subtract 1 to it to account for the background color)
+									$col_ind		= max(0, imagecolorat($tile_table, $tile_sample_x + $tile_x, $tile_sample_y + $tile_y));
+									
+									//Write the color to this position if it's not transparent
+									if ($tile_pal[$col_ind]['a'] > 0)
+									{
+										imagesetpixel($fin_img, (($finimg_x + $microtile_x) * 8) + $tile_x, (($finimg_y + $microtile_y) * 8) + $tile_y, $tile_pal[$col_ind]['palind']);
+									}
+								}
 							}
 						}
 					}
 				}
-			}
-		}
-		
-		//figure out if we're gonna do cool effects or not
-		$cooleffects = mt_rand(0, 5);
-		switch ($cooleffects)
-		{
-			case 5:
-			{
-				//wave effect, like we're under water - can't be done on NES
-				switch ($mode)
-				{
-					case 'SNES':
-					case 'GB':
-					{
-						//create temporary buffer image to copy from
-						$buffer = imagecreate($imgw, $imgh);
-						imagepalettecopy($buffer, $img);
-		
-						//copy image to buffer
-						imagecopy($buffer, $img, 0, 0, 0, 0, $imgw, $imgh);
-						
-						//determine how big to make the wave effect, the stronger it is the more distorted it is
-						$sinestrength = mt_rand(1, 16);
-						
-						//the smaller the height, the less wavy it is
-						$sineheight = mt_rand(0, 30);
-						
-						//copy image back to main image, line by line
-						
-						/*
-							how this works:
-							-	First, divide the sine strength by 2
-							-	Next, we take $y and multiply it by 5 + the sine height
-								This tells us how many degrees we're going to offer to the sine wave
-							-	we then convert the degrees to radians, to pass to the sine
-							-	the sine returns between -1 and 1, so we multiply by the strength and then round
-						*/
-						
-						for ($y = 0; $y < $imgh; $y++)
-						{
-							$offset = round(($sinestrength/2) * sin(deg2rad($y * (5 + $sineheight))));
-							imagecopyresized($img, $buffer, $offset, $y, 0, $y, $imgw, 1, $imgw, 1);
-						}
-						
-						break;
-					}
-				}
-			}
-		}
-		
-		//which way are we gonna scroll and by how much
-		switch ($mode)
-		{
-			case 'NES':
-			case 'GB':
-			{
-				$scroll = mt_rand(0, 16);
-				$scrolldir = mt_rand(0, 1);
-				$x = 0;
-				$y = 0;
 				
-				if ($scrolldir == 1)
-				{
-					//horizontal scroll
-					$x = $scroll;
-					$y = mt_rand(0, 2) * 8;
-				}
-				else
-				{
-					
-					//vertical scroll
-					$x = mt_rand(0, 2) * 8;
-					$y = $scroll;
-				}
-				
-				
-				
-				break;
+				$offset_y++;
 			}
-			case 'SNES':
-			{
-				//snes can scroll any direction so dont worry about it
-				$x = mt_rand(0, 16);
-				$y = mt_rand(0, 16);
-			}
-		}
-		
-		//crop an extra 16x16 (32x32 total) border to trim out overscan effects)
-		$cropped = imagecrop($img, Array(
-											'x' => $x+16, 
-											'y' => $y+16, 
-											'width' => $imgw - 32, 
-											'height' => $imgh - 32
-										)
-									);
-		
-		//do math on size if we're to create an alpha border or not
-		if ($alphaborder === true)
-		{
-			$upsizedw = ($imgw-48) * $upscalemult+2;
-			$upsizedh = ($imgh-48) * $upscalemult+2;
-			//top left offset
-			$bordoffset = 1;
-			//bottom right offset
-			$shrinksize = 2;
-		}
-		else
-		{
-			$upsizedw = ($imgw-48) * $upscalemult;
-			$upsizedh = ($imgh-48) * $upscalemult;
-			$bordoffset = 0;
-			$shrinksize = 0;
-		}
-		
-		//create new image to hold upscaled image
-		$upsized = imagecreate($upsizedw, $upsizedh);
-		imagepalettecopy($upsized, $img);
-		
-		if ($alphaborder === true)
-		{
-			//put a transparent border around it 
-			$transcol = imagecolorallocatealpha($upsized, 255, 0, 255, 127);
 			
-			//use image set pixel instead of drawing a rectangle to guarantee transparency
-			imagerectangle($upsized, 0, 0, $upsizedw-1, $upsizedh-1, $transcol);
+			//Reset the Y offset, add to the X offset
+			$offset_x	+=2;
+			$offset_y	= $base_offset_y;
 		}
 		
-		//copy image to upsize it
-		imagecopyresized(
-					/* source */				$upsized,
-					/* dest */					$cropped,
-					/* dest coords */			$bordoffset, $bordoffset,
-					/* source coords */			0, 0,
-					/* dest widthheight */		$upsizedw - $shrinksize, $upsizedh - $shrinksize,
-					/* source widthheight */	$imgw -48, $imgh - 48
-						);
+		$layer_curr++;
 		
-		//imagepng($upsized, './tmp/glitched.png');
-		imagepng($upsized, $outputpath);
-		
-		imagedestroy($img);
-		imagedestroy($spritetable);
-		imagedestroy($sprite);
-		imagedestroy($cropped);
-	}
-	
-	/*
-		Sprite Table Optimizer
-		Optimizes the sprite table and removes duplicate entries
-		
-		spriteTableOpt()
-			Arguments:
-				$sourcetable			= Path to the sprite table we'll be optimizing (MUST be 8x8 4 color, see included example)
-				$desttable				= Where we'll save the optimized table to
-				$trimbott				= OPTIONAL trims the last row as it may be full of blank tiles except a couple filled out ones
-				$tablecols				= OPTIONAL specifies how many columns the optimized sprite table will have
-			Returns:
-				nothing
-	*/
-	
-	function spriteTableOpt($sourcetable, $desttable, $trimbott = true, $tablecols = 32)
-	{
-		//get unoptimized sprite table
-		$img = imagecreatefrompng($sourcetable);
-		
-		$w = imagesx($img);
-		$h = imagesy($img);
-		
-		
-		//create array of sprites
-		$imgarr = Array();
-		
-		
-		//traverse in chunks of 8
-		for ($y = 0; $y < $h; $y += 8)
+		//If we're about to draw the sprite layer, possibly add a cool effect
+		//to the composited background layer
+		if ($layer_curr <= $layer_max - 1)
 		{
-			for ($x = 0; $x < $w; $x += 8)
+			//figure out if we're gonna do cool effects or not
+			$cooleffects = mt_rand(0, 5);
+			switch ($cooleffects)
 			{
-				//read 8x8 chunk into array
-				$workstr = '';
-				for ($spry = 0; $spry < 8; $spry++)
+				case 5:
 				{
-					for ($sprx = 0; $sprx < 8; $sprx++)
+					//wave effect, like we're under water - can't be done on NES
+					switch ($mode)
 					{
-						$workstr .= imagecolorat($img, $x + $sprx, $y + $spry);
-					}
-				}
-				
-				//push index data onto the array
-				$imgarr[] = $workstr;
-			}
-		}
-		
-		//make new array with no dupes
-		$imgoptarr = array_keys(array_flip($imgarr));
-		unset($imgarr);
-		
-		$arrpos = 0;
-		$arrsize = count($imgoptarr);
-		$strpos = 0;
-		
-		//create new image to hold the new sprites
-		$optimg = imagecreate($tablecols * 8, ($trimbott === true ?  floor($arrsize / $tablecols) * 8 :  ceil($arrsize / $tablecols) * 8));
-		$optw = imagesx($optimg);
-		$opth = imagesy($optimg);
-		
-		//assign colors
-		imagecolorallocate($optimg, 255, 255, 255);
-		imagecolorallocate($optimg, 169, 169, 169);
-		imagecolorallocate($optimg, 84, 84, 84);
-		imagecolorallocate($optimg, 0, 0, 0);
-		
-		//draw new image
-		for ($y = 0; $y < $opth; $y += 8)
-		{
-			for ($x = 0; $x < $optw; $x += 8)
-			{
-				//dont draw any more if we're out of array entries
-				if ($arrpos < $arrsize)
-				{
-					for ($spry = 0; $spry < 8; $spry++)
-					{
-						for ($sprx = 0; $sprx < 8; $sprx++)
+						case 'SNES':
+						case 'GB':
 						{
-							imagesetpixel($optimg, $x + $sprx, $y + $spry, substr($imgoptarr[$arrpos], $strpos, 1));
-							$strpos++;
+							//create temporary buffer image to copy from
+							$buffer = imagecreatetruecolor($finimg_w, $finimg_h);
+			
+							//copy image to buffer
+							imagecopy($buffer, $fin_img, 0, 0, 0, 0, $finimg_w, $finimg_h);
+							
+							//determine how big to make the wave effect, the stronger it is the more distorted it is
+							$sinestrength = mt_rand(1, 16);
+							
+							//the smaller the height, the less wavy it is
+							$sineheight = mt_rand(0, 30);
+							
+							//copy image back to main image, line by line
+							
+							/*
+								how this works:
+								-	First, divide the sine strength by 2
+								-	Next, we take $y and multiply it by 5 + the sine height
+									This tells us how many degrees we're going to offer to the sine wave
+								-	we then convert the degrees to radians, to pass to the sine
+								-	the sine returns between -1 and 1, so we multiply by the strength and then round
+							*/
+							
+							for ($y = 0; $y < $finimg_h; $y++)
+							{
+								$offset = round(($sinestrength/2) * sin(deg2rad($y * (5 + $sineheight))));
+								imagecopyresized($fin_img, $buffer, $offset, $y, 0, $y, $finimg_w, 1, $finimg_h, 1);
+							}
+							
+							//Delete the buffer
+							imagedestroy($buffer);
+							
+							break;
 						}
 					}
-					$arrpos++;
-					$strpos = 0;
 				}
 			}
 		}
 		
-		
-		
-		
-		//write the new image
-		imagepng($optimg, $desttable);
-		
-		//clean up images
-		imagedestroy($img);
-		imagedestroy($optimg);
 	}
+	
+	//Put random junk on the screen (for objects)
+	for ($count = 0; $count < $rand_spr_count; $count++)
+	{
+		$obj_x			= mt_rand(0, $finimg_w);
+		$obj_y			= mt_rand(0, $finimg_h);
+		$obj_w			= mt_rand(1, $obj_max_size);
+		$obj_h			= mt_rand(1, $obj_max_size);
+		
+		//Get a palette
+		$tile_pal			= $our_pal[mt_rand(0, count($our_pal) - 1)];
+		
+		for ($finimg_x = $obj_x; $finimg_x < $obj_x + ($obj_w * 8); $finimg_x+=8)
+		{
+			for ($finimg_y = $obj_y; $finimg_y < $obj_y + ($obj_h * 8); $finimg_y+=8)
+			{
+				//Come up with a tile ID
+				$tile_id		= mt_rand(0, 511);
+				
+				//Figure out where in the table we sample the tile from
+				$tile_sample_x		= $tile_id % 64;
+				$tile_sample_y		= floor($tile_id / 64);
+						
+				//Draw the tile to the final image
+				for ($tile_x = 0; $tile_x < 8; $tile_x++)
+				{
+					for ($tile_y = 0; $tile_y < 8; $tile_y++)
+					{
+						//Get the color index at this position (subtract 1 to it to account for the background color)
+						$col_ind		= max(0, imagecolorat($tile_table, $tile_sample_x + $tile_x, $tile_sample_y + $tile_y));
+						
+						//Write the color to this position if it's not transparent
+						if ($tile_pal[$col_ind]['a'] > 0)
+						{
+							imagesetpixel($fin_img, $finimg_x + $tile_x, $finimg_y + $tile_y, ($col_ind * 4) + $tile_pal[$col_ind]['palind']);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	//Get rid of the tile table
+	imagedestroy($tile_table);
+	
+	//Sample a bit of it
+	$sample_x			= mt_rand(0, $finimg_w - $screen_w);
+	$sample_y			= mt_rand(0, $finimg_h - $screen_h);
+	
+	$cropped_img		= imagecreatetruecolor($screen_w, $screen_h);
+	
+	imagecopy($cropped_img, $fin_img, 0, 0, $sample_x, $sample_y, $screen_w, $screen_h);
+	
+	//Get rid of the old image 
+	imagedestroy($fin_img);
+	
+	//Upsize the image (not cropped yet, fix this later)
+	$upsized_img		= imagecreatetruecolor($screen_w * $scale, $screen_h * $scale);
+	$upsized_w			= imagesx($upsized_img);
+	$upsized_h			= imagesy($upsized_img);
+	
+	imagecopyresized($upsized_img, $cropped_img, 0, 0, 0, 0, $upsized_w, $upsized_h, $screen_w, $screen_h);
+	
+	//Convert it to a palette based image
+	imagetruecolortopalette($upsized_img, false, 255);
+	
+	//Get rid of the cropped image
+	imagedestroy($cropped_img);
+	
+	//Output the file
+	imagepng($upsized_img, $output_path);
+	
+	//Destroy all the images
+	imagedestroy($upsized_img);
+}
+
 ?>
