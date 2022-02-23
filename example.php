@@ -6,5 +6,5 @@
 	spriteTableOpt('./example.png', './exampleopt.png', true, 64);
 	
 	//generate a glitched image based on this sprite table
-	glitchedImgGen('./exampleopt.png', './'.time().'.png', 5);
+	glitched_img_gen('./exampleopt.png', './'.time().'.png', 5);
 ?>
