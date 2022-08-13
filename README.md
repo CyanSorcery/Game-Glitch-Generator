@@ -1,3 +1,7 @@
+# NOTICE
+**This code is depreciated! Please visit the new Version 2:**
+**https://github.com/CyanSorcery/Glitch-Gen-2**
+
 # Game-Glitch-Generator
 Create a glitched image from a sprite table in the style of NES, SNES, or Gameboy
 
